@@ -10,7 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 )
 
-func (crypto *Crypto) account(token_address string) *Crypto {
+func (crypto *Crypto) account(token_address string) {
 	address := common.HexToAddress(token_address)
 
 	fmt.Println(address.Hex())                // 0x71C7656EC7ab88b098defB751B7401B5f6d8976F
@@ -18,10 +18,9 @@ func (crypto *Crypto) account(token_address string) *Crypto {
 	fmt.Println(address.Bytes())              // [113 199 101 110 199 171 136 176 152 222 251 117 27 116 1 181 246 216 151 111]
 	fmt.Println("==========================") // [113 199 101 110 199 171 136 176 152 222 251 117 27 116 1 181 246 216 151 111]
 	crypto.address = address
-	return crypto
 }
 
-func (crypto *Crypto) accountBalance() *Crypto {
+func (crypto *Crypto) accountBalance() {
 	fmt.Println(crypto.address)
 	balance, err := crypto.client.BalanceAt(context.Background(), crypto.address, nil)
 	if err != nil {
@@ -33,5 +32,4 @@ func (crypto *Crypto) accountBalance() *Crypto {
 	ethValue := new(big.Float).Quo(fbalance, big.NewFloat(math.Pow10(18)))
 
 	fmt.Println(ethValue) // 25.729324269165216041
-	return crypto
 }
