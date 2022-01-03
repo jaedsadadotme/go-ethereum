@@ -7,7 +7,7 @@ import (
 	"math"
 	"math/big"
 
-	abi "go-eth/abi_build"
+	abi "go-eth/abi_build/erc20"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -35,43 +35,43 @@ func (crypto *Crypto) accountBalance(token_address string) {
 	fmt.Println(ethValue)
 }
 
-func (crypto *Crypto) balanceOf(wallet_address string, token_address string) {
-	tokenAddress := common.HexToAddress(token_address)
-	instance, err := abi.NewToken(tokenAddress, crypto.client)
-	if err != nil {
-		log.Fatal(err)
+func (crypto *Crypto) balanceOf(wallet_address string) {
+	tokens := []string{
+		"0x2170ed0880ac9a755fd29b2688956bd959f933f8", // ETH
+		"0xe9e7cea3dedca5984780bafc599bd69add087d56", // BUSD
+		"0x2859e4544c4bb03966803b044a93563bd2d0dd4d", // SHIB
 	}
+	for _, token := range tokens {
+		tokenAddress := common.HexToAddress(token)
+		instance, err := abi.NewToken(tokenAddress, crypto.client)
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	address := common.HexToAddress(wallet_address)
-	bal, err := instance.BalanceOf(&bind.CallOpts{}, address)
-	if err != nil {
-		log.Fatal(err)
+		address := common.HexToAddress(wallet_address)
+		bal, err := instance.BalanceOf(&bind.CallOpts{}, address)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		name, err := instance.Name(&bind.CallOpts{})
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// symbol, err := instance.Symbol(&bind.CallOpts{})
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
+
+		decimals, err := instance.Decimals(&bind.CallOpts{})
+		if err != nil {
+			log.Fatal(err)
+		}
+		fbal := new(big.Float)
+		fbal.SetString(bal.String())
+		value := new(big.Float).Quo(fbal, big.NewFloat(math.Pow10(int(decimals))))
+
+		fmt.Printf("%s balance: %f \n", name, value) // "balance: 74605500.647409"
 	}
-
-	name, err := instance.Name(&bind.CallOpts{})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	symbol, err := instance.Symbol(&bind.CallOpts{})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	decimals, err := instance.Decimals(&bind.CallOpts{})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Printf("name: %s\n", name)
-	fmt.Printf("symbol: %s\n", symbol)
-	fmt.Printf("decimals: %v\n", decimals) // "decimals: 18"
-
-	fmt.Printf("wei: %s\n", bal) // "wei: 74605500647408739782407023"
-
-	fbal := new(big.Float)
-	fbal.SetString(bal.String())
-	value := new(big.Float).Quo(fbal, big.NewFloat(math.Pow10(int(decimals))))
-
-	fmt.Printf("balance: %f", value) // "balance: 74605500.647409"
 }
