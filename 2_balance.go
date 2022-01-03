@@ -32,7 +32,7 @@ func (crypto *Crypto) accountBalance(token_address string) {
 	fbalance.SetString(balance.String())
 	ethValue := new(big.Float).Quo(fbalance, big.NewFloat(math.Pow10(18)))
 
-	fmt.Println(ethValue) // 25.729324269165216041
+	fmt.Println(ethValue)
 }
 
 func (crypto *Crypto) balanceOf(wallet_address string, token_address string) {
