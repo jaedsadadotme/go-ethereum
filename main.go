@@ -20,8 +20,10 @@ func (crypto *Crypto) initial(network string) *Crypto {
 func main() {
 	client := Crypto{}
 	client.
-		initial("https://bsc-dataseed.binance.org")
+		initial("https://bsc-dataseed.binance.org").
+		balanceOf("0x999999999999999999999999999999999", "0x2170ed0880ac9a755fd29b2688956bd959f933f8")
+	// accountBalance("0x999999999999999999999999999999999")
 	// createWalletKeyStore("xxxx")
-	// importKs("0x02178dA504cd690ECD8a444348cF80F711c2a093", "xxxx")
-	// updateKs("0x02178dA504cd690ECD8a444348cF80F711c2a093", "xxxx", "yyyy")
+	// importKs("0x999999999999999999999999999999999", "xxxx")
+	// updateKs("0x999999999999999999999999999999999", "xxxx", "yyyy")
 }

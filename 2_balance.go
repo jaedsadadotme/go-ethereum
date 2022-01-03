@@ -7,6 +7,9 @@ import (
 	"math"
 	"math/big"
 
+	abi "go-eth/abi_build"
+
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 )
 
@@ -20,16 +23,55 @@ func (crypto *Crypto) account(token_address string) {
 	crypto.address = address
 }
 
-func (crypto *Crypto) accountBalance() {
-	fmt.Println(crypto.address)
-	balance, err := crypto.client.BalanceAt(context.Background(), crypto.address, nil)
+func (crypto *Crypto) accountBalance(token_address string) {
+	balance, err := crypto.client.BalanceAt(context.Background(), common.HexToAddress(token_address), nil)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(balance) // 25893180161173005034
 	fbalance := new(big.Float)
 	fbalance.SetString(balance.String())
 	ethValue := new(big.Float).Quo(fbalance, big.NewFloat(math.Pow10(18)))
 
 	fmt.Println(ethValue) // 25.729324269165216041
+}
+
+func (crypto *Crypto) balanceOf(wallet_address string, token_address string) {
+	tokenAddress := common.HexToAddress(token_address)
+	instance, err := abi.NewToken(tokenAddress, crypto.client)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	address := common.HexToAddress(wallet_address)
+	bal, err := instance.BalanceOf(&bind.CallOpts{}, address)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	name, err := instance.Name(&bind.CallOpts{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	symbol, err := instance.Symbol(&bind.CallOpts{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	decimals, err := instance.Decimals(&bind.CallOpts{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("name: %s\n", name)
+	fmt.Printf("symbol: %s\n", symbol)
+	fmt.Printf("decimals: %v\n", decimals) // "decimals: 18"
+
+	fmt.Printf("wei: %s\n", bal) // "wei: 74605500647408739782407023"
+
+	fbal := new(big.Float)
+	fbal.SetString(bal.String())
+	value := new(big.Float).Quo(fbal, big.NewFloat(math.Pow10(int(decimals))))
+
+	fmt.Printf("balance: %f", value) // "balance: 74605500.647409"
 }
