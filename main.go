@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
@@ -20,10 +22,10 @@ func (crypto *Crypto) initial(network string) *Crypto {
 
 func main() {
 	client := Crypto{}
+	client.address = common.HexToAddress(os.Args[1])
 	client.
 		initial("https://bsc-dataseed.binance.org").
-		getPrice()
-	// balanceOf("0x000000000000000000000000000000")
+		getPrice(tokens["BUSD"], tokens["ETH"])
 	// accountBalance("0x000000000000000000000000000000")
 	// createWalletKeyStore("xxxx")
 	// importKs("0x000000000000000000000000000000", "xxxx")

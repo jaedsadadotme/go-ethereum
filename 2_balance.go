@@ -13,8 +13,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 )
 
-func (crypto *Crypto) account(token_address string) {
-	address := common.HexToAddress(token_address)
+func (crypto *Crypto) account() {
+	address := crypto.address
 
 	fmt.Println(address.Hex())                // 0x71C7656EC7ab88b098defB751B7401B5f6d8976F
 	fmt.Println(address.Hash().Hex())         // 0x00000000000000000000000071c7656ec7ab88b098defb751b7401b5f6d8976f
@@ -24,7 +24,7 @@ func (crypto *Crypto) account(token_address string) {
 }
 
 func (crypto *Crypto) accountBalance(token_address string) {
-	balance, err := crypto.client.BalanceAt(context.Background(), common.HexToAddress(token_address), nil)
+	balance, err := crypto.client.BalanceAt(context.Background(), crypto.address, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -35,20 +35,15 @@ func (crypto *Crypto) accountBalance(token_address string) {
 	fmt.Println(ethValue)
 }
 
-func (crypto *Crypto) balanceOf(wallet_address string) {
-	tokens := []string{
-		"0x2170ed0880ac9a755fd29b2688956bd959f933f8", // ETH
-		"0xe9e7cea3dedca5984780bafc599bd69add087d56", // BUSD
-		"0x2859e4544c4bb03966803b044a93563bd2d0dd4d", // SHIB
-	}
-	for _, token := range tokens {
+func (crypto *Crypto) balanceOf() {
+	for _, token := range tokens_list {
 		tokenAddress := common.HexToAddress(token)
 		instance, err := abi.NewToken(tokenAddress, crypto.client)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		address := common.HexToAddress(wallet_address)
+		address := crypto.address
 		bal, err := instance.BalanceOf(&bind.CallOpts{}, address)
 		if err != nil {
 			log.Fatal(err)
@@ -58,11 +53,6 @@ func (crypto *Crypto) balanceOf(wallet_address string) {
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		// symbol, err := instance.Symbol(&bind.CallOpts{})
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
 
 		decimals, err := instance.Decimals(&bind.CallOpts{})
 		if err != nil {

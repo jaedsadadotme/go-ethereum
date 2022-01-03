@@ -11,13 +11,13 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 )
 
-func (crypto *Crypto) getPrice() {
+func (crypto *Crypto) getPrice(token0 string, token1 string) {
 	fac_instance, err := factory_abi.NewToken(common.HexToAddress(tokens["factory"]), crypto.client)
 	if err != nil {
 		log.Fatal(err)
 	}
 	//
-	pair_addr, err := fac_instance.GetPair(&bind.CallOpts{}, common.HexToAddress(tokens["BUSD"]), common.HexToAddress(tokens["ETH"]))
+	pair_addr, err := fac_instance.GetPair(&bind.CallOpts{}, common.HexToAddress(token0), common.HexToAddress(token1))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -41,6 +41,15 @@ func (crypto *Crypto) getPrice() {
 		log.Fatal(err)
 	}
 	//
-	token_price := fmt.Sprintf("%f", (price1 / price0))
+	token_instance, err := abi.NewToken(common.HexToAddress(token1), crypto.client)
+	if err != nil {
+		log.Fatal(err)
+	}
+	name, err := token_instance.Name(&bind.CallOpts{})
+	if err != nil {
+		log.Fatal(err)
+
+	}
+	token_price := fmt.Sprintf("%s : $%f", name, (price1 / price0))
 	fmt.Println(token_price)
 }
